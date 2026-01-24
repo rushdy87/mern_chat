@@ -33,15 +33,16 @@ export const signup = async (req, res) => {
     if (!newUser) {
       return res.status(400).json({ message: 'User creation failed.' });
     }
-    generateToken(newUser._id, res);
-    await newUser.save();
+    const savedUser = await newUser.save();
+
+    generateToken(savedUser._id, res);
 
     // TODO: Send welcome email to newUser.email
     return res.status(201).json({
-      id: newUser._id,
-      fullName: newUser.fullName,
-      email: newUser.email,
-      profilePic: newUser.profilePic,
+      id: savedUser._id,
+      fullName: savedUser.fullName,
+      email: savedUser.email,
+      profilePic: savedUser.profilePic,
     });
   } catch (error) {
     console.error(`Error during signup: ${error.message}`);
