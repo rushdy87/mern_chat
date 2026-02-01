@@ -1,9 +1,11 @@
 import path from 'path';
 import express from 'express';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
+import { connectDB } from '../lib/db.js';
 
 dotenv.config({ quiet: true });
 const port = process.env.PORT || 3000;
@@ -11,6 +13,16 @@ const port = process.env.PORT || 3000;
 const app = express();
 const __dirname = path.resolve();
 
+app.use(express.static(path.join(__dirname, 'assets')));
+
+app.get('/images/:imageName', (req, res) => {
+  const imageName = req.params.imageName;
+  const imagePath = path.join(__dirname, 'assets', 'images', imageName);
+  res.sendFile(imagePath);
+});
+
+app.use(express.json());
+app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 
@@ -24,4 +36,5 @@ if (process.env.NODE_ENV === 'production') {
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
+  connectDB();
 });
